@@ -1,0 +1,712 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAPU v3.0 - Registro Integral UNAD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto+Mono:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --unad-blue: #003366;
+            --unad-yellow: #FFCC00;
+            --blood-red: #B91C1C;
+            --glass: rgba(15, 23, 42, 0.95);
+            --success-green: #15803d;
+            --input-bg: #0f172a;
+            --border-color: #334155;
+        }
+
+        body {
+            background-color: #020617;
+            color: #f8fafc;
+            font-family: 'Lato', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-wrapper {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--unad-yellow); padding-bottom: 20px; margin-bottom: 30px; }
+        .logo-unad { width: 180px; height: auto; border-radius: 8px; }
+        .score-value { color: var(--unad-yellow); font-size: 28px; font-weight: bold; font-family: 'Roboto Mono'; }
+
+        .branch { display: none; animation: fadeIn 0.4s ease both; }
+        .branch.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { color: var(--unad-yellow); text-transform: uppercase; margin-bottom: 20px; font-family: 'Montserrat'; font-size: 1.5rem; }
+        h3 { color: #94a3b8; font-size: 1.1rem; margin-top: 0; }
+
+        /* Evita que el texto de la pregunta herede las mayúsculas sostenidas del h2 general */
+        #q-text {
+            text-transform: none !important;
+        }
+
+        .info-box {
+            background: rgba(255, 204, 0, 0.05);
+            border: 1px solid var(--unad-yellow);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+        
+        .section-separator {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid var(--unad-yellow);
+            margin: 30px 0;
+        }
+
+        .grid-inputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .input-card { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 10px; border-left: 4px solid var(--unad-yellow); }
+        .full-width { grid-column: span 3; }
+        .two-cols { grid-column: span 2; }
+        
+        label { font-size: 10px; font-weight: bold; text-transform: uppercase; color: #94a3b8; display: block; margin-bottom: 4px; }
+        input, textarea, select {
+            width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid var(--border-color); color: white; border-radius: 6px; font-family: inherit; box-sizing: border-box; outline: none; font-size: 14px;
+        }
+
+        /* Estilos de las opciones tipo Óvalo */
+        .options-list { margin-top: 15px; }
+        .option-container {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            margin-bottom: 8px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid transparent;
+        }
+        .option-container:hover { background: rgba(255,255,0,0.1); border-color: var(--unad-yellow); }
+        .option-container.selected { background: var(--unad-yellow); color: var(--unad-blue); font-weight: bold; }
+        .oval {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--unad-yellow);
+            border-radius: 50%;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .selected .oval { border-color: var(--unad-blue); background: var(--unad-blue); }
+
+        .time-grid-container { display: flex; flex-direction: column; gap: 15px; }
+        .activity-card { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .days-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 10px; }
+        .day-input-group { text-align: center; }
+        .day-label { font-size: 9px; color: #64748b; margin-bottom: 4px; display: block; }
+        .time-input-small { padding: 6px; text-align: center; font-size: 12px; background: #020617; border: 1px solid #1e293b; width: 100%; box-sizing: border-box; color: white; }
+
+        .status-box { margin-top: 20px; padding: 15px; border-radius: 10px; text-align: center; font-family: 'Roboto Mono'; font-weight: bold; }
+        .status-red { background: rgba(185, 28, 28, 0.1); border: 1px solid var(--blood-red); color: #f87171; }
+        .status-green { background: rgba(21, 128, 61, 0.1); border: 1px solid var(--success-green); color: #4ade80; }
+
+        .investment-card { background: #1e293b; border: 2px solid var(--unad-yellow); border-radius: 20px; padding: 30px; text-align: center; }
+        .price-tag { font-size: 48px; color: var(--unad-yellow); font-family: 'Roboto Mono'; font-weight: bold; margin: 15px 0; }
+
+        .nav-btn {
+            background: var(--unad-yellow); color: var(--unad-blue); padding: 15px 40px; border: none; border-radius: 30px;
+            font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 25px; float: right; transition: 0.3s;
+        }
+        .nav-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,204,0,0.4); }
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Botón Atrás */
+        .back-btn {
+            background: transparent; color: #cbd5e1; padding: 15px 40px; border: 1px solid var(--border-color); border-radius: 30px;
+            font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 25px; float: left; transition: 0.3s;
+        }
+        .back-btn:hover { background: rgba(255, 255, 255, 0.05); color: white; border-color: #64748b; }
+
+        .progress-container { width: 100%; height: 8px; background: #334155; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+        #qProgress { height: 100%; background: var(--unad-yellow); width: 0%; transition: 0.3s; }
+        #qCounter { font-size: 12px; color: var(--unad-yellow); font-family: 'Roboto Mono'; margin-bottom: 10px; display: block; }
+
+        #finalLoader {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 6, 23, 0.98); z-index: 100;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-wrapper">
+    <div id="finalLoader">
+        <i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--unad-yellow);"></i>
+        <h2 style="margin-top: 20px; color: white;">Procesando Registro...</h2>
+    </div>
+
+    <div class="header">
+        <img src="https://noticias.unad.edu.co/images/2013/Acreditacion_de_alta_calidad_para_programas_de_la_UNAD.jpg" class="logo-unad">
+        <div class="score-value" id="globalScore">100%</div>
+    </div>
+
+    <div class="branch active" id="rama1">
+        <h2>Rama 1: Datos Personales</h2>
+        <div class="grid-inputs">
+            <div class="input-card">
+                <label>Tipo Documento</label>
+                <select id="docType">
+                    <option>Cédula Ciudadanía</option>
+                    <option>Tarjeta Identidad</option>
+                    <option>Cédula Extranjería</option>
+                </select>
+            </div>
+            <div class="input-card two-cols">
+                <label>Nombre Completo</label>
+                <input type="text" id="name" placeholder="Ej: Juan Pérez">
+            </div>
+            <div class="input-card">
+                <label>Número Documento</label>
+                <input type="text" id="docNum" placeholder="1020...">
+            </div>
+            <div class="input-card">
+                <label>Edad</label>
+                <input type="number" id="age" min="14" max="100" placeholder="Años">
+            </div>
+            <div class="input-card">
+                <label>Zona donde vive</label>
+                <select id="zoneType">
+                    <option value="" disabled selected>Seleccione zona...</option>
+                    <option>Urbana</option>
+                    <option>Rural</option>
+                </select>
+            </div>
+            <div class="input-card full-width">
+                <label>Dirección Residencia</label>
+                <input type="text" id="address" placeholder="Calle 1 #2-3">
+            </div>
+            <div class="input-card">
+                <label>Teléfono 1</label>
+                <input type="text" id="tel1" placeholder="300...">
+            </div>
+            <div class="input-card">
+                <label>Correo 1 (Personal)</label>
+                <input type="email" id="email1" placeholder="personal@gmail.com">
+            </div>
+            <div class="input-card">
+                <label>Correo 2 (Personal)</label>
+                <input type="email" id="email2" placeholder="alterno@gmail.com">
+            </div>
+
+            <div class="input-card">
+                <label>Programa Académico</label>
+                <select id="prog">
+                    <option value="" disabled selected>Seleccione programa...</option>
+                    <optgroup label="⚙️ECBTI (Escuela de Ciencias Básicas, Tecnología e Ingeniería)">
+                        <option>Ingeniería de Sistemas</option>
+                        <option>Ingeniería Industrial</option>
+                        <option>Ingeniería Electrónica</option>
+                        <option>Ingeniería de Telecomunicaciones</option>
+                        <option>Ingeniería Multimedia</option>
+                        <option>Ingeniería en energias</option>
+                        <option>Diseño Industrial</option>
+                    </optgroup>
+                    <optgroup label="💰ECACEN (Escuela de Ciencias Administrativas, Contables, Económicas y de Negocios)">
+                        <option>Administración de Empresas</option>
+                        <option>Contaduría Pública</option>
+                        <option>Economía</option>
+                        <option>Negocios Internacionales</option>
+                        <option>Finanzas y Negocios Internacionales</option>
+                        <option>Negocios Marketing Digital</option>
+                    </optgroup>
+                    <optgroup label="📚ECEDU (Escuela de Ciencias de la Educación)">
+                        <option>Licenciatura en Lenguas Extranjeras</option>
+                        <option>Licenciatura en Pedagogía Infantil</option>
+                        <option>Licenciatura en Etnoeducación</option>
+                        <option>Licenciatura en Matematicas</option>
+                        <option>Licenciatura en Filosofia</option>
+                    </optgroup>
+                    <optgroup label="🩺ECISA (Escuela de Ciencias de la Salud)">
+                        <option>Administración en Salud</option>
+                        <option>Prefesional en seguridad y salud en el trabajo</option>
+                    </optgroup>
+                    <optgroup label="⚖️ECJP (Escuela de Ciencias Jurídicas y Políticas)">
+                        <option>Tecnologia en gestiòn juridica</option>
+                        <option>Ciencia Política</option>
+                    </optgroup>
+                    <optgroup label="🌿ECAPMA (Escuela de Ciencias Agrícolas, Pecuarias y del Medio Ambiente)">
+                        <option>Agronomía</option>
+                        <option>Zootecnia</option>
+                        <option>Ingeniería Ambiental</option>
+                        <option>Ingeniería Agroforestal</option>
+                        <option>Administraciòn ambiental</option>
+                    </optgroup>
+                    <optgroup label="🎭ECSAH (Escuelas de Ciencias Sociales, Artes y Humanidades)">
+                        <option>Comunicación Social</option>
+                        <option>Música</option>
+                        <option>Gestión deportiva</option>
+                        <option>Historia</option>
+                        <option>Sociología</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>POLITICA DE GRATUIDAD 16-02 2026</strong><br><br>
+            De acuerdo con lo previsto en la Ley 1581 de 2012 por medio de la cual se expidió el 
+            Régimen General de Protección de Datos Personales, y su Decreto reglamentario 1377 de 
+            2013, autorizo expresamente a la Universidad Nacional Abierta y a Distancia para que mis 
+            datos personales puedan ser utilizados de conformidad con la reglamentación vigente. 
+            Declaro haber leído la cláusula anterior, siendo el envío de sus datos la aceptación de la 
+            misma.
+        </div>
+
+        <button class="nav-btn" onclick="validateStep1()">Siguiente</button>
+    </div> 
+
+    <div class="branch" id="rama2">
+        <h2>Rama 2: ¡Queremos conocer tu día a día!</h2>
+        
+        <div class="info-box" style="background: rgba(255, 204, 0, 0.02); border-color: rgba(255, 204, 0, 0.3); margin-bottom: 20px;">
+            <i class="fa-solid fa-circle-info" style="color: var(--unad-yellow); margin-right: 8px;"></i>
+            <strong>¿Qué debe hacer aquí?</strong><br>
+            Este organizador interactivo le permite proyectar su tiempo semanal de forma realista. Recuerde que el modelo de estudio autónomo de la UNAD requiere un promedio de 40 horas semanales de dedicación académica. Su jornada diaria no debe exceder las 24 horas físicas en la distribución.                
+            <br><br>
+            <span class="text-red">Instrucciones:</span><br>
+            Marca en cada día cuantas horas dedicas a la actividad indicada, ten en cuenta que esta información debe ser realista de acuerdo a tus quehaceres rutinarios.
+            Es importante marcar las horas de estudio que dedicarás a tu programa.
+        </div>
+
+        <div class="time-grid-container" id="timeGridContainer"></div>
+        <div class="activity-card" style="margin-top: 15px; border-top: 2px solid var(--unad-yellow);">
+             <div class="days-row" id="dayTotalsRow"></div>
+        </div>
+        <div id="timeStatus" class="status-box"></div>
+        <button class="back-btn" onclick="go(1)">Atrás</button>
+        <button class="nav-btn" id="btnTimeNext" onclick="go(3)">Siguiente</button>
+    </div>
+
+    <div class="branch" id="rama3">
+        <h2>Rama 3: ¿Sabes cuánto cuesta tu semestre?</h2>
+        <div class="investment-card">
+            <p>Este dinero se invierte en usted en cada periodo aproximadamente:</p>
+            <div class="price-tag">$2.800.000</div>
+            
+            <p style="color: #f87171; font-weight: bold; font-style: italic;">
+                "Le recordamos que, en caso de renunciar o retirarse del programa tras haber accedido al beneficio, los fondos asignados no serán reembolsables. Asimismo, esta acción inhabilitará la oportunidad de otorgar dicho recurso a otro postulante que cumpla con los requisitos para aprovecharlo."
+            </p>
+        </div>
+        <button class="back-btn" onclick="go(2)">Atrás</button>
+        <button class="nav-btn" onclick="aceptarResponsabilidad()">Acepto la responsabilidad</button>
+    </div>
+
+    <div class="branch" id="rama4">
+        <span id="qCounter">1/25</span>
+        <div class="progress-container"><div id="qProgress"></div></div>
+        
+        <div id="question-header-box" style="display:none;" class="section-separator">
+            <h2 id="section-title"></h2>
+            <h3 id="section-subtitle"></h3>
+        </div>
+
+        <h2 id="q-text" style="color: white; font-size: 1.2rem; min-height: 50px;"></h2>
+        <p id="q-sub" style="color: #94a3b8; font-size: 0.9rem; margin-top: -10px; margin-bottom: 20px;"></p>
+        
+        <div id="input-container" style="display:none; margin-bottom: 20px;"></div>
+        
+        <div id="options-container" class="options-list"></div>
+
+        <button class="back-btn" id="qBackBtn" onclick="previousQuestion()">Atrás</button>
+        <button class="nav-btn" id="qNextBtn" onclick="processQuestion()" style="float:right;">Continuar</button>
+    </div>
+
+    <div class="branch" id="rama5">
+        <div style="text-align: center; padding: 40px;">
+            <i class="fas fa-check-circle fa-5x" style="color: #4ade80;"></i>
+            <h2 style="margin-top: 20px;">¡Registro Completado!</h2>
+            <p>Sus respuestas han sido procesadas correctamente.</p>
+            
+            <div style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 15px; border: 1px solid var(--unad-yellow);">
+                <p style="font-size: 1.1rem; color: var(--unad-yellow); font-weight: bold;">¡Muchas gracias por su participación!</p>
+                <p style="color: #cbd5e1;">Por favor, esté muy pendiente de su <strong>correo electrónico</strong> personal y de la institución, donde recibirá nuevas indicaciones y los siguientes pasos de su proceso.</p>
+            </div>
+            <button onclick="location.reload()" class="nav-btn" style="float:none; margin-top: 30px;">Nuevo Registro</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentQIndex = 0;
+    let score = 100;
+    let selectedOption = null;
+
+    // URL de tu Apps Script para la recepción del JSON
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw24AkF62zrM3DuVroX904M17VeZNY7VZORlkwbZQnY1rQ6Lk_PoEgSkI26jY55zgBdvQ/exec";
+
+    // Estructura de almacenamiento centralizado de datos
+    const registroEstudiante = {
+        tipo_documento: "",
+        numero_documento: "",
+        nombre_completo: "",
+        edad: "",
+        zona: "",
+        direccion: "",
+        telefono: "",
+        correo_personal: "",
+        correo_alterno: "",
+        programa_academico: "",
+        totales_horario: { work: 0, sleep: 0, hobby: 0, study: 0, family: 0 },
+        acepta_responsabilidad: "NO",
+        fileName: "",
+        fileData: "", 
+        respuestas_banco: {}, 
+        puntaje_cuestionario: 0,
+        porcentaje_aprobacion: 0,
+        estado: "Reprobado"
+    };
+
+    const questions = [
+        { id: 1, type: "oval", q: "¿Cuál será su herramienta tecnológica principal para su proceso educativo?", o: ["Computador portátil/Computador de mesa", "Celular", "Tablet", "No tengo computador, lo haré desde el celular"] },
+        { id: 2, type: "oval", q: "¿Cuenta con conexión permanente a internet? *", s: "Marca solo un óvalo.", o: ["Sí", "No"] },
+        { id: 3, type: "oval", q: "¿Has estudiado en otra Universidad? *", s: "Marca solo un óvalo.", o: ["Sí", "No"] },
+        { id: 4, type: "year", q: "Último año de vinculación académica", s: "Seleccione el año en que terminó estudios anteriores." },
+        { id: 5, type: "oval", q: "¿Presentas alguna Habilidad diversa (Discapacidad)?", o: ["Sí", "No"], logic: true },
+        
+        // SECCIÓN GRATUIDAD
+        { id: 6, type: "oval", header: "Política de Gratuidad", subtitle: "A continuación encontrarás preguntas relacionadas a política de gratuidad, las cuales fueron socializadas durante la reunión informativa, lee con atención y selecciona la respuesta correcta", q: "¿Cuál es la modalidad de estudio que ofrece la Universidad Nacional Abierta y a Distancia (UNAD)?", o: ["Modalidad Hibrida", "Modalidad Presencial de Tiempo Completo", "Modalidad a Distancia", "Modalidad Virtual"], correct: "Modalidad Hibrida" },
+        { id: 7, type: "oval", q: "En el Modelo Heutagógico Unadista Solidario, ¿Cuál es el componente fundamental que orienta el proceso formativo del estudiante?", o: ["El aprendizaje colaborativo como estrategia de interacción", "El aprendizaje significativo basado en los contenidos teóricos", "El aprendizaje autónomo como eje central del desarrollo del estudiante", "La participación en sesiones sincrónicas como medio principal del aprendizaje"], correct: "El aprendizaje autónomo como eje central del desarrollo del estudiante" },
+        { id: 8, type: "oval", q: "A qué nivel de formación aplica el beneficio de la Política de Gratuidad en la UNAD?", o: ["Programas de Pregrado", "A Posgrados y Programas Profesionales", "Programas de Posgrado", "Técnicos y Tecnólogos"], correct: "Programas de Pregrado" },
+        { id: 9, type: "oval", q: "¿Cuántos créditos académicos cubre el beneficio de la Política de Gratuidad por cada período académico en la UNAD?", o: ["15 créditos académicos", "21 créditos académicos", "14 créditos académicos", "18 créditos académicos"], correct: "14 créditos académicos" },
+        { id: 10, type: "oval", q: "Si un estudiante desea matricular 18 créditos académicos, pero Política de Gratuidad solo le cubre 14 créditos, ¿qué debe hacer?", o: ["Esperar a que la universidad le cubra el 100%", "Realizar el trámite de créditos adicionales", "No puede matricular más créditos académicos", "Esperar al semestre intersemestral"], correct: "Realizar el trámite de créditos adicionales" },
+        { id: 11, type: "oval", q: "Si un aspirante no cuenta con la certificación de que pertenece a un grupo poblacional vulnerable, ¿Qué otra documentación puede presentar para postularse al beneficio?", o: ["Sisbén en Subgrupo A, B, o C", "Recibo de Servicio Público (estrato 1, 2 o 3)", "Registro Único de Victimas (UARIV)", "Certificado de Habilidad Diversa"], correct: "Sisbén en Subgrupo A, B, o C" },
+        { id: 12, type: "oval", q: "'Política de Gratuidad tiene un límite de edad para los aspirantes'. ¿Es correcta esta afirmación?", o: ["Verdadero", "Falso"], correct: "Falso" },
+        { id: 13, type: "oval", q: "¿En qué período académico iniciará su proceso de formación si continúa con la postulación a la Política de Gratuidad?", o: ["Primer Semestre 2026", "Periodo I 16-02 2026", "Periodo I 16-01 2026", "Periodo II 16-04 2026"], correct: "Periodo II 16-04 2026" },
+        { id: 14, type: "oval", q: "Si un estudiante interrumpe sus estudios por más de dos (2) períodos académicos, ¿Podrá retomar su formación con el beneficio de la Política de Gratuidad?", o: ["Sí, puede continuar porque aún no ha completado los giros de su plan de estudios", "No, no puede continuar, ya que incumplió el Reglamento Operativo", "Sí, pero deberá pagar una multa al Ministerio de Educación", "No, debe esperar y matricular el siguiente semestre con el beneficio"], correct: "No, no puede continuar, ya que incumplió el Reglamento Operativo" },
+        { id: 15, type: "oval", q: "¿Cuál es la institución responsable de otorgar el beneficio de la Política de Gratuidad?", o: ["La Universidad Nacional Abierta y a Distancia – UNAD", "Registro y Control del CCAV Pitalito", "El Ministerio de Educación Nacional", "Tutores y monitores de la universidad"], correct: "El Ministerio de Educación Nacional" },
+        { id: 16, type: "text", q: "Caso Juan: Juan es un estudiante de décimo semestre de Ingeniería Industrial... al revisar se confirma que perdió varios períodos y le faltan créditos. Escriba su análisis:", s: "Escriba su respuesta en el cuadro.", isOpen: true, maxPoints: 34 },
+        { id: 17, type: "oval", q: "¿Cuál es la razón por la que Juan ya no puede acceder al beneficio de la Política de Gratuidad?", o: ["Porque tiene bajo rendimiento académico", "Porque ya completó los giros posibles de su plan de estudios", "Porque incumplió el Reglamento Operativo de la Política de Gratuidad", "Porque no matriculó la opción de grado"], correct: "Porque ya completó los giros posibles de su plan de estudios" },
+        { id: 18, type: "oval", q: "¿Cuáles son los documentos que se requieren para postularse al beneficio de la Política de Gratuidad?", o: ["Diploma y acta de bachiller, documento de identidad, examen ICFES, Sisbén IV y fotografía", "Diploma y acta de bachiller básico, documento de identidad, examen ICFES, UARIV y fotografía", "Diploma y acta de bachiller, tarjeta de identidad, examen ICFES, grupo poblacional vulnerable y fotografía", "Diploma y acta de bachiller, documento de identidad, examen ICFES, grupo poblacional vulnerable y fotografía"], correct: "Diploma y acta de bachiller, documento de identidad, examen ICFES, grupo poblacional vulnerable y fotografía" },
+        
+        // SECCIÓN TIC
+        { id: 19, type: "oval", header: "El rol de las TIC en la U", subtitle: "Es fundamental para nosotros conocer tus competencias en TIC... selecciona la respuesta correcta.", q: "¿Cuál herramienta de ofimática es la más adecuada para crear presentaciones multimedia (diapositivas)?", o: ["Microsoft PowerPoint", "Microsoft Word", "Microsoft Excel", "Adobe Acrobat"], correct: "Microsoft PowerPoint" },
+        { id: 20, type: "oval", q: "¿Cuál es la función principal de Microsoft Word? *", o: ["Crear presentaciones", "Escribir y editar documentos de texto", "Realizar cálculos avanzados", "Navegar por Internet"], correct: "Escribir y editar documentos de texto" },
+        { id: 21, type: "oval", q: "Para almacenar y compartir archivos en línea, se puede utilizar:", o: ["Google Drive", "Word", "PowerPoint", "Outlook"], correct: "Google Drive" },
+        { id: 22, type: "oval", q: "Para trabajar colaborativamente en línea en un documento, la opción más adecuada es:", o: ["Guardarlo en el escritorio del computador", "Subirlo a Google Drive o OneDrive", "Compartirlo por correo electrónico", "Enviarlo por Whatsapp"], correct: "Subirlo a Google Drive o OneDrive" },
+        { id: 23, type: "oval", q: "Al redactar un correo electrónico, ¿qué se debe colocar en el campo 'Asunto'?", o: ["Todo el contenido del mensaje", "Un título breve y claro", "El nombre del remitente", "Ninguna información"], correct: "Un título breve y claro" },
+        { id: 24, type: "oval", q: "Al ordenar el orden correcto para redactar un correo electrónico profesional?", o: ["Escribir el mensaje, agregar destinatario, escribir asunto", "Agregar destinatario, escribir asunto corto, redactar el mensaje en el cuerpo", "Escribir asunto, redactar mensaje, agregar destinatario", "Redactar mensaje, colocar asunto largo, enviar"], correct: "Agregar destinatario, escribir asunto corto, redactar el mensaje en el cuerpo" },
+        
+        // SECCIÓN COMPROMISO
+        { id: 25, type: "text", header: "¡Me comprometo con la U!", subtitle: "Responda las siguientes preguntas abiertas. Cuide la ortografía.", q: "Teniendo en cuenta la modalidd Híbrida, describe dos (2) acciones concretas para evitar reprobar:", s: "Redacte sus acciones aquí.", isOpen: true, maxPoints: 35 },
+        { id: 26, type: "text", q: "¿Cuál es su principal compromiso académico con la UNAD para demostrar que hará un uso adecuado del beneficio de Gratuidad?", s: "Redacte su compromiso aquí.", isOpen: true, maxPoints: 35 }
+    ];
+
+    function go(n) {
+        document.querySelectorAll('.branch').forEach(b => b.classList.remove('active'));
+        const target = document.getElementById('rama' + n);
+        if (target) {
+            target.classList.add('active');
+            if(n === 4) renderQuestion();
+        }
+    }
+
+    function validateStep1() {
+        const req = ['name', 'docNum', 'age', 'zoneType', 'address', 'tel1', 'email1', 'email2', 'prog'];
+        let pass = true;
+        req.forEach(id => {
+            const el = document.getElementById(id);
+            if(el && !el.value) { el.style.border = "1px solid red"; pass = false; }
+            else if(el) { el.style.border = "1px solid var(--border-color)"; }
+        });
+        
+        if(pass) {
+            registroEstudiante.tipo_documento = document.getElementById('docType') ? document.getElementById('docType').value : "";
+            registroEstudiante.numero_documento = document.getElementById('docNum').value;
+            registroEstudiante.nombre_completo = document.getElementById('name').value;
+            registroEstudiante.edad = document.getElementById('age').value;
+            registroEstudiante.zona = document.getElementById('zoneType').value;
+            registroEstudiante.direccion = document.getElementById('address').value;
+            registroEstudiante.telefono = document.getElementById('tel1').value;
+            registroEstudiante.correo_personal = document.getElementById('email1').value;
+            registroEstudiante.correo_alterno = document.getElementById('email2').value;
+            registroEstudiante.programa_academico = document.getElementById('prog').value;
+            go(2);
+        } else {
+            alert("Por favor complete todos los datos personales obligatorios.");
+        }
+    }
+
+    function aceptarResponsabilidad() {
+        registroEstudiante.acepta_responsabilidad = "SÍ";
+        go(4);
+    }
+
+    function renderQuestion() {
+        const q = questions[currentQIndex];
+        if(!q) { finalize(); return; }
+
+        selectedOption = null;
+        document.getElementById('qCounter').innerText = (currentQIndex + 1) + " / " + questions.length;
+        document.getElementById('qProgress').style.width = ((currentQIndex + 1) / questions.length * 100) + "%";
+        
+        const headerBox = document.getElementById('question-header-box');
+        if(q.header) {
+            headerBox.style.display = "block";
+            document.getElementById('section-title').innerText = q.header;
+            document.getElementById('section-subtitle').innerText = q.subtitle || "";
+        } else {
+            headerBox.style.display = "none";
+        }
+
+        document.getElementById('q-text').innerText = q.q;
+        document.getElementById('q-sub').innerText = q.s || "";
+
+        const optionsContainer = document.getElementById('options-container');
+        const inputContainer = document.getElementById('input-container');
+        optionsContainer.innerHTML = "";
+        inputContainer.innerHTML = "";
+        inputContainer.style.display = "none";
+
+        if(q.type === "oval") {
+            q.o.forEach(opt => {
+                const div = document.createElement('div');
+                div.className = "option-container";
+                div.innerHTML = `<div class="oval"></div><span>${opt}</span>`;
+                
+                if(registroEstudiante.respuestas_banco["Q" + q.id] === opt) {
+                    div.classList.add('selected');
+                    selectedOption = opt;
+                }
+
+                div.onclick = () => {
+                    document.querySelectorAll('.option-container').forEach(c => c.classList.remove('selected'));
+                    div.classList.add('selected');
+                    selectedOption = opt;
+                };
+                optionsContainer.appendChild(div);
+            });
+        } else if(q.type === "year") {
+            inputContainer.style.display = "block";
+            const select = document.createElement('select');
+            select.id = "yearSelect";
+            for(let y = 2026; y >= 1980; y--) {
+                const op = document.createElement('option');
+                op.value = y; op.text = y;
+                select.appendChild(op);
+            }
+            if(registroEstudiante.respuestas_banco["Q" + q.id]) {
+                select.value = registroEstudiante.respuestas_banco["Q" + q.id];
+            }
+            inputContainer.appendChild(select);
+        } else if(q.type === "text") {
+            inputContainer.style.display = "block";
+            const area = document.createElement('textarea');
+            area.id = "textInput";
+            area.rows = 4;
+            area.placeholder = "Escriba aquí...";
+            if(registroEstudiante.respuestas_banco["Q" + q.id]) {
+                area.value = registroEstudiante.respuestas_banco["Q" + q.id];
+            }
+            inputContainer.appendChild(area);
+        } else if(q.type === "file") {
+            inputContainer.style.display = "block";
+            inputContainer.innerHTML = `<p style='font-size:12px; color:var(--unad-yellow)'>Adjunte su certificado de discapacidad (PDF/Imagen):</p>
+                                        <input type='file' id='fileInput' style='padding:5px;'>`;
+        }
+    }
+
+    function processQuestion() {
+        const q = questions[currentQIndex];
+        
+        if(q.type === "oval") {
+            if(!selectedOption) { alert("Por favor seleccione una opción."); return; }
+            registroEstudiante.respuestas_banco["Q" + q.id] = selectedOption;
+        } else if(q.type === "year") {
+            registroEstudiante.respuestas_banco["Q" + q.id] = document.getElementById('yearSelect').value;
+        } else if(q.type === "text") {
+            const inputVal = document.getElementById('textInput').value;
+            if(inputVal.trim().length < 5) { alert("Por favor escriba una respuesta más detallada."); return; }
+            registroEstudiante.respuestas_banco["Q" + q.id] = inputVal;
+        } else if(q.type === "file") {
+            const fileEl = document.getElementById('fileInput');
+            if(fileEl && fileEl.files.length > 0) {
+                const file = fileEl.files[0];
+                registroEstudiante.fileName = file.name;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    registroEstudiante.fileData = e.target.result;
+                    avanzarPregunta(q);
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
+        }
+
+        avanzarPregunta(q);
+    }
+
+    function avanzarPregunta(q) {
+        if(q.logic && selectedOption === "Sí") {
+            if(!questions.some(item => item.id === "file_q")) {
+                questions.splice(currentQIndex + 1, 0, { id: "file_q", type: "file", q: "Adjuntar Certificado de Discapacidad", s: "Este archivo se sincronizará con el Drive institucional." });
+            }
+        } else if(q.logic && selectedOption === "No") {
+            const idx = questions.findIndex(item => item.id === "file_q");
+            if(idx !== -1) questions.splice(idx, 1);
+            registroEstudiante.fileName = "";
+            registroEstudiante.fileData = "";
+        }
+
+        currentQIndex++;
+        renderQuestion();
+    }
+
+    function previousQuestion() {
+        if (currentQIndex > 0) {
+            if (questions[currentQIndex].id === "file_q") {
+                questions.splice(currentQIndex, 1);
+            }
+            currentQIndex--;
+            renderQuestion();
+        } else {
+            go(3);
+        }
+    }
+
+    function finalize() {
+        document.getElementById('finalLoader').style.display = "flex";
+        
+        let puntosTotales = 0;
+
+        // Calificación automatizada del bloque de preguntas
+        questions.forEach(q => {
+            const resEstudiante = registroEstudiante.respuestas_banco["Q" + q.id];
+            if(q.correct) {
+                if(resEstudiante === q.correct) puntosTotales += 22; 
+            } else if(q.isOpen) {
+                if(resEstudiante && resEstudiante.trim().length > 15) puntosTotales += q.maxPoints;
+            }
+        });
+
+        registroEstudiante.puntaje_cuestionario = puntosTotales;
+        registroEstudiante.porcentaje_aprobacion = Math.min(100, Math.round((puntosTotales / 500) * 100));
+        registroEstudiante.estado = puntosTotales >= 300 ? "Aprobado" : "Reprobado";
+
+        // Transmisión estructurada de los datos al Backend en Sheets
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(registroEstudiante)
+        })
+        .then(() => {
+            document.getElementById('finalLoader').style.display = "none";
+            go(5);
+        })
+        .catch(err => {
+            console.error("Error en la transmisión de datos:", err);
+            document.getElementById('finalLoader').style.display = "none";
+            go(5);
+        });
+    }
+
+    // LÓGICA DE TIEMPO
+    const categories = [
+        { id: 'work', label: 'Trabajo Remunerado' },
+        { id: 'sleep', label: 'Descanso / Sueño' },
+        { id: 'hobby', label: 'Deporte / Ocio' },
+        { id: 'study', label: 'Estudio Independiente' },
+        { id: 'family', label: 'Vida Familiar' }
+    ];
+    const daysShort = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+
+    function initTimeGrid() {
+        const container = document.getElementById('timeGridContainer');
+        const totalsRow = document.getElementById('dayTotalsRow');
+        if(!container || !totalsRow) return;
+        
+        container.innerHTML = "";
+        categories.forEach(cat => {
+            let card = `<div class="activity-card"><div class="activity-header"><span style='color:var(--unad-yellow)'>${cat.label}</span> <span>Total: <b id="total-${cat.id}">0</b>h</span></div><div class="days-row">`;
+            for(let i=0; i<7; i++) {
+                card += `<div class="day-input-group"><span class="day-label">${daysShort[i]}</span><input type="number" min="0" max="24" class="time-input-small time-input" data-cat="${cat.id}" data-day="${i}" value="0" oninput="calculateTotals()"></div>`;
+            }
+            card += `</div></div>`;
+            container.innerHTML += card;
+        });
+        totalsRow.innerHTML = "";
+        for(let i=0; i<7; i++) {
+            totalsRow.innerHTML += `<div class="day-input-group"><span class="day-label" style="color:white">Día ${i+1}</span><div id="day-total-${i}" style="font-weight:bold; font-size:12px">0</div></div>`;
+        }
+    }
+
+    function calculateTotals() {
+        let dayTotals = [0,0,0,0,0,0,0];
+        let catTotals = { work:0, sleep:0, hobby:0, study:0, family:0 };
+        let isValid = true;
+        
+        document.querySelectorAll('.time-input').forEach(input => {
+            const val = parseInt(input.value) || 0;
+            dayTotals[input.dataset.day] += val;
+            catTotals[input.dataset.cat] += val;
+        });
+        
+        // Mapeo persistente de horas al objeto recolector centralizado
+        registroEstudiante.totales_horario = catTotals;
+        
+        categories.forEach(cat => {
+            const el = document.getElementById(`total-${cat.id}`);
+            if(el) el.innerText = catTotals[cat.id];
+        });
+        
+        dayTotals.forEach((total, i) => {
+            const el = document.getElementById(`day-total-${i}`);
+            if(el) {
+                el.innerText = total + "h";
+                el.style.color = total > 24 ? "#f87171" : "#4ade80";
+            }
+            if(total > 24) isValid = false;
+        });
+        
+        const studyTotal = catTotals['study'];
+        const status = document.getElementById('timeStatus');
+        const btn = document.getElementById('btnTimeNext');
+        
+        if(!status || !btn) return;
+
+        if(!isValid) { 
+            status.innerText = "⚠️ ERROR: Un día no puede tener más de 24 horas."; 
+            status.className = "status-box status-red"; 
+            btn.disabled = true; 
+        }
+        else if(studyTotal < 14) { 
+            status.innerText = "⏳ ALERTA: Debes dedicar al menos 14h semanales al estudio (Llevas " + studyTotal + "h)."; 
+            status.className = "status-box status-red"; 
+            btn.disabled = true; 
+        }
+        else { 
+            status.innerText = "✅ Distribución equilibrada (Total Estudio: " + studyTotal + "h)."; 
+            status.className = "status-box status-green"; 
+            btn.disabled = false; 
+        }
+    }
+
+    window.onload = () => { initTimeGrid(); calculateTotals(); };
+</script>
+
+</body>
+</html>
