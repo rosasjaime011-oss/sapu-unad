@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -314,7 +314,22 @@
         <button class="nav-btn" onclick="aceptarResponsabilidad()">Acepto la responsabilidad</button>
     </div>
 
-    <div class="branch" id="rama4">
+
+
+<div class="branch" id="rama6">
+        <h2>Evidencia del curso</h2>
+        <div class="info-box">
+            <strong>Sube aquí la evidencia del curso autodirigido de orientación vocacional.</strong><br>
+            Asegúrate de que el archivo sea un PDF o imagen clara.
+        </div>
+        <div class="input-card" style="margin-bottom: 20px;">
+            <input type="file" id="evidenciaCurso" accept="image/*,application/pdf" style="width: 100%;">
+        </div>
+        <button class="back-btn" onclick="go(3)">Atrás</button>
+        <button class="nav-btn" onclick="validarYContinuarEvidencia()">Continuar al cuestionario</button>
+
+
+    </div>    <div class="branch" id="rama4">
         <span id="qCounter">1/25</span>
         <div class="progress-container"><div id="qProgress"></div></div>
         
@@ -397,9 +412,8 @@
         { id: 13, type: "oval", q: "¿En qué período académico iniciará su proceso de formación si continúa con la postulación a la Política de Gratuidad?", o: ["Primer Semestre 2026", "Periodo I 16-02 2026", "Periodo I 16-01 2026", "Periodo II 16-04 2026"], correct: "Periodo II 16-04 2026" },
         { id: 14, type: "oval", q: "Si un estudiante interrumpe sus estudios por más de dos (2) períodos académicos, ¿Podrá retomar su formación con el beneficio de la Política de Gratuidad?", o: ["Sí, puede continuar porque aún no ha completado los giros de su plan de estudios", "No, no puede continuar, ya que incumplió el Reglamento Operativo", "Sí, pero deberá pagar una multa al Ministerio de Educación", "No, debe esperar y matricular el siguiente semestre con el beneficio"], correct: "No, no puede continuar, ya que incumplió el Reglamento Operativo" },
         { id: 15, type: "oval", q: "¿Cuál es la institución responsable de otorgar el beneficio de la Política de Gratuidad?", o: ["La Universidad Nacional Abierta y a Distancia – UNAD", "Registro y Control del CCAV Pitalito", "El Ministerio de Educación Nacional", "Tutores y monitores de la universidad"], correct: "El Ministerio de Educación Nacional" },
-        { id: 16, type: "text", q: "Caso Juan: Juan es un estudiante de décimo semestre de Ingeniería Industrial... al revisar se confirma que perdió varios períodos y le faltan créditos. Escriba su análisis:", s: "Escriba su respuesta en el cuadro.", isOpen: true, maxPoints: 34 },
-        { id: 17, type: "oval", q: "¿Cuál es la razón por la que Juan ya no puede acceder al beneficio de la Política de Gratuidad?", o: ["Porque tiene bajo rendimiento académico", "Porque ya completó los giros posibles de su plan de estudios", "Porque incumplió el Reglamento Operativo de la Política de Gratuidad", "Porque no matriculó la opción de grado"], correct: "Porque ya completó los giros posibles de su plan de estudios" },
-        { id: 18, type: "oval", q: "¿Cuáles son los documentos que se requieren para postularse al beneficio de la Política de Gratuidad?", o: ["Diploma y acta de bachiller, documento de identidad, examen ICFES, Sisbén IV y fotografía", "Diploma y acta de bachiller básico, documento de identidad, examen ICFES, UARIV y fotografía", "Diploma y acta de bachiller, tarjeta de identidad, examen ICFES, grupo poblacional vulnerable y fotografía", "Diploma y acta de bachiller, documento de identidad, examen ICFES, grupo poblacional vulnerable y fotografía"], correct: "Diploma y acta de bachiller, documento de identidad, examen ICFES, grupo poblacional vulnerable y fotografía" },
+        
+        { id: 16, type: "oval", q: "¿Cuáles son los documentos que se requieren para postularse al beneficio de la Política de Gratuidad?", o: ["Diploma y acta de bachiller, documento de identidad, examen ICFES, Sisbén IV y fotografía", "Diploma y acta de bachiller básico, documento de identidad, examen ICFES, UARIV y fotografía", "Diploma y acta de bachiller, tarjeta de identidad, examen ICFES, grupo poblacional vulnerable y fotografía", "Diploma y acta de bachiller, documento de identidad, examen ICFES, grupo poblacional vulnerable y fotografía"], correct: "Diploma y acta de bachiller, documento de identidad, examen ICFES, grupo poblacional vulnerable y fotografía" },
         
         // SECCIÓN TIC
         { id: 19, type: "oval", header: "El rol de las TIC en la U", subtitle: "Es fundamental para nosotros conocer tus competencias en TIC... selecciona la respuesta correcta.", q: "¿Cuál herramienta de ofimática es la más adecuada para crear presentaciones multimedia (diapositivas)?", o: ["Microsoft PowerPoint", "Microsoft Word", "Microsoft Excel", "Adobe Acrobat"], correct: "Microsoft PowerPoint" },
@@ -410,8 +424,7 @@
         { id: 24, type: "oval", q: "Al ordenar el orden correcto para redactar un correo electrónico profesional?", o: ["Escribir el mensaje, agregar destinatario, escribir asunto", "Agregar destinatario, escribir asunto corto, redactar el mensaje en el cuerpo", "Escribir asunto, redactar mensaje, agregar destinatario", "Redactar mensaje, colocar asunto largo, enviar"], correct: "Agregar destinatario, escribir asunto corto, redactar el mensaje en el cuerpo" },
         
         // SECCIÓN COMPROMISO
-        { id: 25, type: "text", header: "¡Me comprometo con la U!", subtitle: "Responda las siguientes preguntas abiertas. Cuide la ortografía.", q: "Teniendo en cuenta la modalidd Híbrida, describe dos (2) acciones concretas para evitar reprobar:", s: "Redacte sus acciones aquí.", isOpen: true, maxPoints: 35 },
-        { id: 26, type: "text", q: "¿Cuál es su principal compromiso académico con la UNAD para demostrar que hará un uso adecuado del beneficio de Gratuidad?", s: "Redacte su compromiso aquí.", isOpen: true, maxPoints: 35 }
+        { id: 25, type: "text", header: "¡Me comprometo con la U!", subtitle: "Responda las siguientes preguntas abiertas. Cuide la ortografía.",  q: "¿Cuál es su principal compromiso académico con la UNAD para demostrar que hará un uso adecuado del beneficio de Gratuidad?", s: "Redacte su compromiso aquí.", isOpen: true, maxPoints: 35 }
     ];
 
     function go(n) {
@@ -451,7 +464,7 @@
 
     function aceptarResponsabilidad() {
         registroEstudiante.acepta_responsabilidad = "SÍ";
-        go(4);
+        go(6);
     }
 
     function renderQuestion() {
@@ -562,7 +575,7 @@
     function avanzarPregunta(q) {
         if(q.logic && selectedOption === "Sí") {
             if(!questions.some(item => item.id === "file_q")) {
-                questions.splice(currentQIndex + 1, 0, { id: "file_q", type: "file", q: "Adjuntar Certificado de Discapacidad", s: "Este archivo se sincronizará con el Drive institucional." });
+                questions.splice(currentQIndex + 1, 0, { id: "file_q", type: "file", q: "Adjuntar Certificado de Discapacidad y/o historial clínico.", s: "Este archivo se sincronizará con el Drive institucional." });
             }
         } else if(q.logic && selectedOption === "No") {
             const idx = questions.findIndex(item => item.id === "file_q");
