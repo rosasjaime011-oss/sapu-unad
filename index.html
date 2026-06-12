@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -731,6 +731,26 @@
     }
 
     window.onload = () => { initTimeGrid(); calculateTotals(); };
+function validarYContinuarEvidencia() {
+    const fileInput = document.getElementById('evidenciaCurso');
+    
+    // Validar si el archivo fue seleccionado
+    if (!fileInput.files || fileInput.files.length === 0) {
+        alert("Por favor, adjunta tu archivo de evidencia antes de continuar.");
+        return;
+    }
+
+    // Si hay archivo, guarda el nombre en el registro y avanza
+    registroEstudiante.fileName = fileInput.files[0].name;
+    
+    // Opcional: convertir a base64 si tu sistema lo requiere
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        registroEstudiante.fileData = e.target.result;
+        go(4); // Llama a la función 'go' para pasar a la rama 4 (Cuestionario)
+    };
+    reader.readAsDataURL(fileInput.files[0]);
+}
 </script>
 
 </body>
