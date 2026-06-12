@@ -265,8 +265,28 @@
             </div>
         </div>
 
+ <div class="input-card">
+    <label>¿Actualmente se encuentra laborando en una empresa?</label>
+    <select id="trabajaEmpresa" onchange="toggleEmpresa(this.value)">
+        <option value="No">No</option>
+        <option value="Si">Sí</option>
+    </select>
+</div>
+
+<div class="form-group" id="grupoEmpresa" style="display: none;">
+    <label>¿Cuál es el nombre de la empresa?</label>
+    <input type="text" id="nombreEmpresa" placeholder="Ingrese nombre de la empresa">
+</div>
+
+<script>
+function toggleEmpresa(valor) {
+    document.getElementById('grupoEmpresa').style.display = (valor === 'Si') ? 'block' : 'none';
+}
+</script>
+
+
         <div class="info-box">
-            <strong>POLITICA DE GRATUIDAD 16-02 2026</strong><br><br>
+            <strong>POLITICA DE GRATUIDAD 16-04 2026</strong><br><br>
             De acuerdo con lo previsto en la Ley 1581 de 2012 por medio de la cual se expidió el 
             Régimen General de Protección de Datos Personales, y su Decreto reglamentario 1377 de 
             2013, autorizo expresamente a la Universidad Nacional Abierta y a Distancia para que mis 
@@ -277,6 +297,7 @@
 
         <button class="nav-btn" onclick="validateStep1()">Siguiente</button>
     </div> 
+
 
     <div class="branch" id="rama2">
         <h2>Rama 2: ¡Queremos conocer tu día a día!</h2>
@@ -614,7 +635,9 @@
 
     function finalize() {
         document.getElementById('finalLoader').style.display = "flex";
-        
+
+        registroEstudiante.labora_actualmente = document.getElementById('trabajaEmpresa').value;
+    registroEstudiante.nombre_empresa = document.getElementById('nombreEmpresa').value || "N/A";
         let puntosTotales = 0;
 
         // Calificación automatizada del bloque de preguntas
@@ -630,6 +653,11 @@
         registroEstudiante.puntaje_cuestionario = puntosTotales;
         registroEstudiante.porcentaje_aprobacion = Math.min(100, Math.round((puntosTotales / 500) * 100));
         registroEstudiante.estado = puntosTotales >= 300 ? "Aprobado" : "Reprobado";
+
+// --- AGREGA ESTO AQUÍ ANTES DEL FETCH ---
+    registroEstudiante.labora_actualmente = document.getElementById('trabajaEmpresa').value;
+    registroEstudiante.nombre_empresa = document.getElementById('nombreEmpresa').value || "N/A";
+
 
         // Transmisión estructurada de los datos al Backend en Sheets
         fetch(WEB_APP_URL, {
@@ -648,6 +676,7 @@
             go(5);
         });
     }
+
 
     // LÓGICA DE TIEMPO
     const categories = [
@@ -731,6 +760,7 @@
     }
 
     window.onload = () => { initTimeGrid(); calculateTotals(); };
+
 function validarYContinuarEvidencia() {
     const fileInput = document.getElementById('evidenciaCurso');
     
