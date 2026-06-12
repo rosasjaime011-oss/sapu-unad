@@ -734,22 +734,24 @@
 function validarYContinuarEvidencia() {
     const fileInput = document.getElementById('evidenciaCurso');
     
-    // Validar si el archivo fue seleccionado
     if (!fileInput.files || fileInput.files.length === 0) {
-        alert("Por favor, adjunta tu archivo de evidencia antes de continuar.");
+        alert("Por favor, adjunta tu archivo de evidencia.");
         return;
     }
 
-    // Si hay archivo, guarda el nombre en el registro y avanza
-    registroEstudiante.fileName = fileInput.files[0].name;
+    const file = fileInput.files[0];
     
-    // Opcional: convertir a base64 si tu sistema lo requiere
+    // USAMOS UNA PROPIEDAD DIFERENTE PARA NO SOBREESCRIBIR LA OTRA EVIDENCIA
+    registroEstudiante.fileNameVocacional = file.name;
+    
     const reader = new FileReader();
     reader.onload = function(e) {
-        registroEstudiante.fileData = e.target.result;
-        go(4); // Llama a la función 'go' para pasar a la rama 4 (Cuestionario)
+        // GUARDAMOS EL CONTENIDO DEL ARCHIVO AQUÍ
+        registroEstudiante.fileDataVocacional = e.target.result;
+        console.log("Archivo vocacional capturado:", registroEstudiante.fileNameVocacional);
+        go(4); 
     };
-    reader.readAsDataURL(fileInput.files[0]);
+    reader.readAsDataURL(file);
 }
 </script>
 
