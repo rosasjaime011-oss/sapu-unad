@@ -758,6 +758,26 @@ function toggleEmpresa(valor) {
     }
 
     window.onload = () => { initTimeGrid(); calculateTotals(); };
+ function validarYContinuarEvidencia() {
+    const fileInput = document.getElementById('evidenciaCurso');
+    
+    if (!fileInput.files || fileInput.files.length === 0) {
+        alert("Por favor, adjunta tu archivo de evidencia.");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    
+    // USAMOS UNA PROPIEDAD DIFERENTE PARA NO SOBREESCRIBIR LA OTRA EVIDENCIA
+    registroEstudiante.fileNameVocacional = file.name;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        // GUARDAMOS EL CONTENIDO DEL ARCHIVO AQUÍ
+        registroEstudiante.fileDataVocacional = e.target.result;
+        console.log("Archivo vocacional capturado:", registroEstudiante.fileNameVocacional);
+        go(4); 
+    };
 
 
     reader.readAsDataURL(file);
